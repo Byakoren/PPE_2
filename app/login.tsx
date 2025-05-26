@@ -28,11 +28,11 @@ export default function Login() {
     //API de test.
     async function loging(username:string,password:string){
      
-      const response = await fetch('https://dummyjson.com/auth/login',{
+      const response = await fetch('https://9ee9-2001-41d0-fc22-6f12-dd8b-bc90-e1e6-f7f3.ngrok-free.app/api/login',{
         method: 'POST',
         headers: { "Content-Type": "application/json"},
         body: JSON.stringify({
-          username: username,
+          email: username,
           password: password,
           expiresInMins:30,
         }),
