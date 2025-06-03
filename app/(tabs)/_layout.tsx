@@ -1,10 +1,13 @@
 import { Tabs, useLocalSearchParams } from 'expo-router';
 
+// Layout principal des onglets de l'application
 export default function TabLayout() {
+  // Récupération des paramètres utilisateur (prénom, rôle)
   const { prenom, role } = useLocalSearchParams();
 
   return (
     <Tabs>
+      {/* Onglet Accueil */}
       <Tabs.Screen
         name="(home)/index"
         options={{
@@ -14,6 +17,7 @@ export default function TabLayout() {
         initialParams={{ prenom, role }}
       />
 
+      {/* Onglet Émargement : affiché différemment selon le rôle */}
       {role === "ROLE_INTERVENANT" ? (
         <Tabs.Screen
           name="(emargement)/emargement_intervenant"
@@ -31,11 +35,13 @@ export default function TabLayout() {
         />
       )}
 
+      {/* Onglet Historique */}
       <Tabs.Screen
         name="(historique)/historique"
         options={{ title: 'Historique' }}
         initialParams={{ prenom, role }}
       />
+      {/* Onglet Profil */}
       <Tabs.Screen
         name="(profil)/profil"
         options={{ title: 'Profil' }}
