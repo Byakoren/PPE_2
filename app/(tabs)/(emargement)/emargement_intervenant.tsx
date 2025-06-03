@@ -1,15 +1,15 @@
 import React, { useRef, useState, useEffect } from 'react';
-import {View, Text, StyleSheet, Alert, Image, TouchableOpacity, ScrollView,} from 'react-native';
+import { View, Text, StyleSheet, Alert, Image, TouchableOpacity, ScrollView, TextInput } from 'react-native';
 import Signature from 'react-native-signature-canvas';
 import { LinearGradient } from 'expo-linear-gradient';
 import { API_BASE_URL } from '../../config';
 import { useLocalSearchParams } from 'expo-router';
 
-// Écran principal pour l'émargement de l'intervenant
 export default function EmargementScreen() {
   const [cours, setCours] = useState<any>(null);
   const [signature, setSignature] = useState<string | null>(null);
   const signatureRef = useRef<any>(null);
+  const [scrollEnabled, setScrollEnabled] = useState(true);
 
   const { id } = useLocalSearchParams();
   const userId = parseInt(id as string, 10);
@@ -19,7 +19,11 @@ export default function EmargementScreen() {
     prenom: string;
     nom: string;
     signature: string | null;
+    participationId: number;
+    validation: boolean;
+    retard: number;
   };
+
   const [apprenants, setApprenants] = useState<Apprenant[]>([]);
 
   useEffect(() => {
@@ -34,7 +38,11 @@ export default function EmargementScreen() {
           if (!data.message && data.id) {
             setCours(data);
             if (Array.isArray(data.apprenants)) {
-              setApprenants(data.apprenants);
+              setApprenants(data.apprenants.map((a: any) => ({
+                ...a,
+                validation: false,
+                retard: 0,
+              })));
             }
           }
         } catch (e) {
@@ -78,6 +86,29 @@ export default function EmargementScreen() {
     }
   };
 
+  const validerPresence = async (apprenant: Apprenant) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/presence/valider`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            idUser: apprenant.id,
+            idCours: cours.id,
+            retard: apprenant.retard || 0
+        }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        Alert.alert('Validation réussie', `${apprenant.prenom} validé`);
+      } else {
+        Alert.alert('Erreur', result.message || 'Échec de la validation');
+      }
+    } catch (error) {
+      Alert.alert('Erreur', 'Impossible de valider.');
+    }
+  };
+
   if (!cours) {
     return (
       <View style={styles.emptyContainer}>
@@ -89,7 +120,7 @@ export default function EmargementScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <ScrollView contentContainerStyle={styles.scrollContainer} scrollEnabled={scrollEnabled}>
       <LinearGradient colors={['#273273', '#020024']} style={styles.background} />
       <View style={styles.innerContainer}>
         <Image source={require("../../../assets/images/gefor_vect3lueur.png")} style={styles.logo} />
@@ -104,7 +135,11 @@ export default function EmargementScreen() {
           <Signature
             ref={signatureRef}
             onOK={handleOK}
-            onEnd={() => signatureRef.current?.readSignature()}
+            onBegin={() => setScrollEnabled(false)}
+            onEnd={() => {
+              signatureRef.current?.readSignature();
+              setScrollEnabled(true);
+            }}
             webStyle={styleSignature}
           />
         </View>
@@ -117,16 +152,26 @@ export default function EmargementScreen() {
           <Text style={styles.buttonText}>ENVOYER L'ÉMARGEMENT</Text>
         </TouchableOpacity>
 
-        {/* Liste des apprenants */}
         <Text style={styles.listTitle}>👥 Apprenants du cours</Text>
-        {apprenants.map((a) => (
+        {apprenants.map((a, index) => (
           <View key={a.id} style={styles.apprenantRow}>
-            <Text style={styles.apprenantText}>
-              {a.prenom} {a.nom}
-            </Text>
-            <Text style={styles.apprenantStatus}>
-              {a.signature ? "✅" : "❌"}
-            </Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.apprenantText}>{a.prenom} {a.nom}</Text>
+              <TextInput
+                placeholder="Retard (minutes)"
+                placeholderTextColor="#ccc"
+                keyboardType="numeric"
+                style={styles.input}
+                onChangeText={(text) => {
+                  const updated = [...apprenants];
+                  updated[index].retard = parseInt(text || '0');
+                  setApprenants(updated);
+                }}
+              />
+            </View>
+            <TouchableOpacity style={styles.validateButton} onPress={() => validerPresence(a)}>
+              <Text style={styles.validateText}>Valider</Text>
+            </TouchableOpacity>
           </View>
         ))}
       </View>
@@ -134,7 +179,6 @@ export default function EmargementScreen() {
   );
 }
 
-// Styles
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
@@ -185,13 +229,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
+  clearButton: {
+    backgroundColor: "#FF6347",
+  },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-  },
-  clearButton: {
-    backgroundColor: "#FF6347",
   },
   emptyContainer: {
     flex: 1,
@@ -228,6 +272,7 @@ const styles = StyleSheet.create({
   },
   apprenantRow: {
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#ffffff22",
     padding: 12,
@@ -238,10 +283,28 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
   },
-  apprenantStatus: {
-    fontSize: 18,
+  input: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    color: "#000",
+    marginTop: 5,
+  },
+  validateButton: {
+    backgroundColor: "#4CAF50",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginTop: 30,
+    marginLeft: 10,
+  },
+  validateText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
+
 
 const styleSignature = `
   .m-signature-pad--footer { display: none; margin: 0px; }

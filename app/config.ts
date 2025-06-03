@@ -1,7 +1,7 @@
 // app/config.ts
 
 // === URL de l'API back ===
-export const API_BASE_URL = 'https://e636-2a01-cb00-670-8900-947-49a8-9061-58e6.ngrok-free.app'; // remplace par l'actuelle
+export const API_BASE_URL = 'https://7395-2a01-cb00-dd7-9a00-ae58-70bc-a01-f2a1.ngrok-free.app'; // remplace par l'actuelle
 
 // Pour plus tard : versions locales/dev/prod
 export const IS_DEV = true;
