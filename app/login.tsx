@@ -10,6 +10,7 @@ import { useState } from "react";
 import { Button, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import  { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { API_BASE_URL } from './config';
 
 //_________________________________
 
@@ -28,7 +29,7 @@ export default function Login() {
     //API de test.
     async function loging(username:string,password:string){
      
-      const response = await fetch('https://25b5-2a01-cb00-dd7-9a00-ae58-70bc-a01-f2a1.ngrok-free.app/api/login',{
+      const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
         headers: { "Content-Type": "application/json"},
         body: JSON.stringify({
@@ -47,12 +48,14 @@ export default function Login() {
         const prenom = data.prenom ?? "Utilisateur";
         const roles = data.roles ?? [];
         const mainRole = roles[0] ?? "ROLE_USER";
+        const id = data.id;
 
         // Redirection vers la racine des tabs avec params
         router.push({
-          pathname: "/(tabs)",
-          params: { prenom, role: mainRole },
+          pathname: "/(tabs)/(home)", // ou juste "/(tabs)" si tu veux la racine
+          params: { id: data.id, prenom, role: mainRole },
         });
+
       } else {
         setMsgError(true);
       }

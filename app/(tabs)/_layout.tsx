@@ -17,7 +17,10 @@ export default function TabLayout() {
       {role === "ROLE_INTERVENANT" ? (
         <Tabs.Screen
           name="(emargement)/emargement_intervenant"
-          options={{ title: 'Émarger' }}
+          options={{ 
+            title: 'Émarger',
+            headerShown: false,
+          }}
           initialParams={{ prenom, role }}
         />
       ) : (

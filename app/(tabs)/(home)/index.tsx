@@ -1,10 +1,26 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../config";
 
 export default function Welcome() {
   const router = useRouter();
-  const { prenom, role } = useLocalSearchParams();
+  const { id, prenom, role } = useLocalSearchParams();
+  const userId = parseInt(id as string, 10);
+
+  const [coursActuel, setCoursActuel] = useState<any>(null);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    fetch(`${API_BASE_URL}/api/cours/du-jour/${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.message) setCoursActuel(data);
+      })
+      .catch(err => console.error("Erreur fetch cours du jour", err));
+  }, [userId]);
 
   return (
     <View style={styles.container}>
@@ -21,11 +37,15 @@ export default function Welcome() {
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
-            if (role === "ROLE_INTERVENANT") {
-              router.push("/emargement_intervenant");
-            } else {
-              router.push("/emargement_apprenant");
-            }
+            const target =
+              role === "ROLE_INTERVENANT"
+                ? "/(tabs)/(emargement)/emargement_intervenant"
+                : "/(tabs)/(emargement)/emargement_apprenant";
+
+            router.push({
+              pathname: target,
+              params: { id, prenom, role },
+            });
           }}
         >
           <Text style={styles.buttonText}>Émarger</Text>
@@ -38,10 +58,19 @@ export default function Welcome() {
         <TouchableOpacity style={styles.button} onPress={() => router.push("/profil")}>
           <Text style={styles.buttonText}>Profil</Text>
         </TouchableOpacity>
+
+        {coursActuel && (
+          <View style={{ marginTop: 20 }}>
+            <Text style={{ color: "#fff", textAlign: "center" }}>
+              📘 Cours actuel : {coursActuel.intitule} ({coursActuel.horaire})
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );
 }
+
 
 
 const styles = StyleSheet.create({
