@@ -28,7 +28,7 @@ export default function Login() {
     //API de test.
     async function loging(username:string,password:string){
      
-      const response = await fetch('https://9ee9-2001-41d0-fc22-6f12-dd8b-bc90-e1e6-f7f3.ngrok-free.app/api/login',{
+      const response = await fetch('https://25b5-2a01-cb00-dd7-9a00-ae58-70bc-a01-f2a1.ngrok-free.app/api/login',{
         method: 'POST',
         headers: { "Content-Type": "application/json"},
         body: JSON.stringify({
@@ -39,18 +39,21 @@ export default function Login() {
         credentials: 'include'
       
       })
-      //La réponse est stocké dans un objet nommé data
-      const data = await response.json();
-      console.log(data);
 
-      //Vérifie si le login est valide.Si valide redirection vers la page d'émargement.
-      //Sinon un méssage s'affiche.
-      if(response.ok){
-  
-        console.log("Access token:",data.accessToken);
-        router.replace('/(tabs)/(home)');
+      const data = await response.json(); 
 
-      }else{
+      if (response.ok) {
+        // Récupération du prénom et du rôle principal
+        const prenom = data.prenom ?? "Utilisateur";
+        const roles = data.roles ?? [];
+        const mainRole = roles[0] ?? "ROLE_USER";
+
+        // Redirection vers la racine des tabs avec params
+        router.push({
+          pathname: "/(tabs)",
+          params: { prenom, role: mainRole },
+        });
+      } else {
         setMsgError(true);
       }
     }
