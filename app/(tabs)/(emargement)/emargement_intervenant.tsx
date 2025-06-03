@@ -14,22 +14,18 @@ export default function EmargementScreen() {
 
   const { id } = useLocalSearchParams();
   const userId = parseInt(id as string, 10);
-  console.log("ID reçu:", id, "→ Parsed:", userId);
 
 
     useEffect(() => {
     if (!userId || isNaN(userId)) return;
 
-    console.log("→ ID prêt :", userId);
 
     fetch(`${API_BASE_URL}/api/cours/du-jour/${userId}`)
         .then(async res => {
         const raw = await res.text();
-        console.log('→ Réponse brute :', raw);
 
         try {
             const data = JSON.parse(raw);
-            console.log('→ JSON parsé :', data);
 
             if (!data.message && data.id) {
             setCours(data);
@@ -50,26 +46,45 @@ export default function EmargementScreen() {
 };
 
 
-  const envoyerEmargement = async () => {
+    const envoyerEmargement = async () => {
     if (!cours || !signature) return;
 
-    const response = await fetch(`${API_BASE_URL}/api/emargement`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        idUser: userId,
-        idCours: cours.id,
-        signature: signature
-      }),
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/emargement`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            idUser: userId,
+            idCours: cours.id,
+            signature: signature
+        }),
+        });
 
-    const result = await response.json();
-    Alert.alert('Succès', result.message);
-  };
+        const result = await response.json();
 
-  if (!cours) {
-    return <Text style={styles.info}>Aucun cours en cours</Text>;
-  }
+        if (!response.ok) {
+        // ✋ Message d'erreur API (ex: déjà signé)
+        Alert.alert('Erreur', result.message || "Une erreur est survenue.");
+        } else {
+        Alert.alert('Succès', result.message);
+        }
+    } catch (error) {
+        // 🔥 Erreur réseau ou autre
+        Alert.alert("Erreur", "Impossible d'envoyer l'émargement.");
+        console.error("Erreur lors de l'envoi :", error);
+    }
+    };
+
+    if (!cours) {
+    return (
+        <View style={styles.emptyContainer}>
+        <LinearGradient colors={["#273273", "#020024"]} style={styles.background} />
+        <Text style={styles.emptyText}>🚫 Aucun cours en cours</Text>
+        <Text style={styles.emptySubtext}>Veuillez revenir plus tard ou contacter l'administration</Text>
+        </View>
+    );
+    }
+
 
   return (
     <View style={{ flex: 1 }}>
@@ -84,10 +99,12 @@ export default function EmargementScreen() {
 
         <View style={styles.signatureBox}>
             <Signature
-            ref={signatureRef}
-            onOK={handleOK}
-            descriptionText=""
-            webStyle={styleSignature}
+                ref={signatureRef}
+                onOK={handleOK}
+                onEnd={() => {
+                    signatureRef.current?.readSignature(); // ➜ déclenche onOK()
+                }}
+                webStyle={styleSignature}
             />
         </View>
 
@@ -154,7 +171,6 @@ info: {
   marginTop: 50,
 },
 
-
 background: {
   position: "absolute",
   height: "100%",
@@ -168,7 +184,32 @@ clearButton: {
 },
 
 
-  
+emptyContainer: {
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+  position: "relative",
+},
+emptyImage: {
+  width: 200,
+  height: 200,
+  resizeMode: "contain",
+  marginBottom: 20,
+},
+emptyText: {
+  fontSize: 22,
+  color: "#F24C27",
+  fontWeight: "bold",
+  marginBottom: 10,
+  textAlign: "center",
+},
+emptySubtext: {
+  fontSize: 16,
+  color: "#fff",
+  textAlign: "center",
+  opacity: 0.7,
+},
+
 });
 
 const styleSignature = `
