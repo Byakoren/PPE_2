@@ -19,14 +19,24 @@ export default function TabLayout() {
 
       {/* Onglet Émargement : affiché différemment selon le rôle */}
       {role === "ROLE_INTERVENANT" ? (
-        <Tabs.Screen
-          name="(emargement)/emargement_intervenant"
-          options={{ 
-            title: 'Émarger',
-            headerShown: false,
-          }}
-          initialParams={{ prenom, role }}
-        />
+        <>
+          <Tabs.Screen
+            name="(emargement)/emargement_intervenant"
+            options={{ 
+              title: 'Émarger',
+              headerShown: false,
+            }}
+            initialParams={{ prenom, role }}
+          />
+          <Tabs.Screen
+            name="(voiremarg)/voir_emargement.tsx"
+            options={{ 
+              title: 'Voir emargement',
+              headerShown: true,
+            }}
+            //initialParams={{ prenom, role }}
+          />
+        </>
       ) : (
         <Tabs.Screen
           name="(emargement)/emargement_apprenant"
@@ -34,7 +44,7 @@ export default function TabLayout() {
           initialParams={{ prenom, role }}
         />
       )}
-
+      
       {/* Onglet Historique */}
       <Tabs.Screen
         name="(historique)/historique"

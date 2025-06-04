@@ -59,6 +59,21 @@ export default function Welcome() {
           <Text style={styles.buttonText}>Émarger</Text>
         </TouchableOpacity>
 
+         
+         <TouchableOpacity
+          style={styles.button_voir}
+          disabled={ role === "ROLE_APPRENANT" ? true : false}
+          onPress={()=>{router.push("/voiremarg")}}
+                 
+
+           
+          >
+          
+         
+          <Text style={styles.buttonText}>Voir Émargement</Text>
+        </TouchableOpacity>
+
+
         {/* Bouton pour accéder à l'historique */}
         <TouchableOpacity style={styles.button} onPress={() => router.push("/historique")}>
           <Text style={styles.buttonText}>Historique</Text>
@@ -107,6 +122,16 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#F24C27",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    marginBottom: 15,
+    width: "100%",
+    alignItems: "center",
+  },
+  button_voir: {
+    
+    backgroundColor:  "#F24C27",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 10,
