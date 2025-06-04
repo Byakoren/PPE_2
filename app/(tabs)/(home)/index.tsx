@@ -1,20 +1,17 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../../config";
+import MenuButton from "../../component/MenuButton";
 
-// Écran d'accueil principal
 export default function Welcome() {
   const router = useRouter();
-  // Récupération des paramètres de navigation (id, prénom, rôle)
   const { id, prenom, role } = useLocalSearchParams();
   const userId = parseInt(id as string, 10);
 
-  // État pour stocker le cours du jour (s'il existe)
   const [coursActuel, setCoursActuel] = useState<any>(null);
 
-  // Effet pour charger le cours du jour à l'ouverture de l'écran
   useEffect(() => {
     if (!userId) return;
 
@@ -28,22 +25,20 @@ export default function Welcome() {
 
   return (
     <View style={styles.container}>
-      {/* Fond en dégradé */}
       <LinearGradient colors={["#273273", "#020024"]} style={styles.background} />
 
       <View style={styles.fullCard}>
-        {/* Logo de l'application */}
         <Image
           source={require("../../../assets/images/gefor_vect3lueur.png")}
           style={styles.logo}
           resizeMode="contain"
         />
-        {/* Message de bienvenue personnalisé */}
+
         <Text style={styles.greeting}>Bonjour {prenom ?? "Utilisateur"} 👋</Text>
 
-        {/* Bouton pour accéder à l'émargement (intervenant ou apprenant) */}
-        <TouchableOpacity
-          style={styles.button}
+        {/* Bouton Émarger */}
+        <MenuButton
+          title="Émarger"
           onPress={() => {
             const target =
               role === "ROLE_INTERVENANT"
@@ -55,21 +50,25 @@ export default function Welcome() {
               params: { id, prenom, role },
             });
           }}
-        >
-          <Text style={styles.buttonText}>Émarger</Text>
-        </TouchableOpacity>
+        />
 
-        {/* Bouton pour accéder à l'historique */}
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/historique")}>
-          <Text style={styles.buttonText}>Historique</Text>
-        </TouchableOpacity>
+        {/* Bouton Historique */}
+        <MenuButton
+          title="Historique"
+          onPress={() => router.push("/historique")}
+        />
 
-        {/* Bouton pour accéder au profil */}
-        <TouchableOpacity style={styles.button} onPress={() => router.push("/profil")}>
-          <Text style={styles.buttonText}>Profil</Text>
-        </TouchableOpacity>
+        {/* Bouton Profil */}
+        <MenuButton
+          title="Profil"
+          onPress={() =>
+            router.push({
+              pathname: "/(tabs)/(profil)/profil",
+              params: { id: id?.toString() },
+            })
+          }
+        />
 
-        {/* Affichage du cours actuel si disponible */}
         {coursActuel && (
           <View style={{ marginTop: 20 }}>
             <Text style={{ color: "#fff", textAlign: "center" }}>
@@ -82,7 +81,6 @@ export default function Welcome() {
   );
 }
 
-// Styles de l'écran d'accueil
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -105,24 +103,10 @@ const styles = StyleSheet.create({
     color: "#F24C27",
     marginBottom: 30,
   },
-  button: {
-    backgroundColor: "#F24C27",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 10,
-    marginBottom: 15,
-    width: "100%",
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
   fullCard: {
     flex: 1,
     width: '100%',
-    justifyContent: 'space-evenly', 
+    justifyContent: 'space-evenly',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 80,

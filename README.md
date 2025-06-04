@@ -113,3 +113,121 @@ Ce projet est open-source et disponible sous la [Licence MIT](https://opensource
 ##  Conclusion
 
 Cette application d'émargement est un exemple simple mais efficace de ce qui peut être réalisé avec React Native. J'espère qu'elle sera utile à d'autres étudiants qui apprennent React Native ! Bon codage !  
+
+
+##  Ajout de la nouvelle fonctionnalité de la page de profil pour tout utilisateur
+
+* Documentation technique :
+
+                                            Fonctionnalités
+
+La page de profil permet à un utilisateur (apprenant ou intervenant) de :
+
+    • Visualiser ses informations personnelles (nom, prénom, email).
+
+    • Voir sa photo de profil (avatar).
+
+    • Modifier sa photo de profil via la galerie d’images du téléphone.
+
+    • Valider l’upload manuellement via un bouton.
+
+
+                                            API Symfony
+
+GET /api/user/{id}
+
+Récupère les informations du profil utilisateur.
+
+Réponse :
+
+{
+  "id": 12,
+  "prenom": "Jean",
+  "nom": "Dupont",
+  "email": "jean.dupont@email.com",
+  "avatar": "avatar_664f1234567.jpg",
+  "success": true
+}
+
+POST /api/user/{id}/upload-avatar
+
+Permet à l’utilisateur de modifier son avatar. Le fichier est uploadé et renommé automatiquement côté serveur.
+
+Requête :
+
+    Format multipart/form-data
+
+    Clé : avatar
+
+    Type : image/*
+
+Réponse en cas de succès :
+
+{
+  "success": true,
+  "message": "Avatar mis à jour"
+}
+
+Réponse en cas d’erreur :
+
+{
+  "success": false,
+  "message": "Aucun fichier reçu"
+}
+
+Le fichier est stocké dans : public/uploads/avatars/
+
+Configuration (dans config/services.yaml) :
+
+parameters:
+  avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
+
+
+                                        Côté React Native
+
+Dépendances utilisées
+
+npx expo install expo-image-picker
+
+                                          Fonctionnement
+
+    Chargement automatique des infos depuis /api/user/{id} dans useEffect.
+
+    Si avatar est défini, il est affiché à partir du chemin ${API_BASE_URL}/uploads/avatars/${avatar}.
+
+    La sélection d’une nouvelle image ouvre la galerie via expo-image-picker.
+
+    L’image est temporairement affichée localement.
+
+    Un bouton “Valider l’avatar” permet d’envoyer l’image vers l’API (format FormData).
+
+                                    Arborescence des fichiers liés
+
+src/
+├── screens/
+│   └── profil/
+│       └── ProfilScreen.tsx
+└── assets/
+    └── images/
+        └── photo_profil.png   (avatar par défaut)
+
+
+                                            Résultat UX/UI
+
+    Interface épurée avec fond dégradé.
+
+    Avatar centré, modifiable, avec feedback visuel.
+
+    Bouton "Changer la photo" et "Valider l’avatar".
+
+    Affichage en lecture seule des infos essentielles.
+
+
+* Documentation utilisateur : 
+
+Pour accéder à la page de profil, l'utilisateur doit suivre ses différentes étapes :
+    - Vous devez vous connecter à votre compte via la page de login avec vos identifiants ;
+    - Une fois sur la page d'accueil il vous suffit de cliquer sur le troisième bouton orange avec écrit Profil dessus ;
+    - Une fois sur la page de profil vous aurez accès à votre Prénom, Nom et Email, le tout non modifiable depuis cette page, si une faute ou une erreur est présente sur votre profil merci de contacter votre responsable pour en demander la modification ;
+    - Vous aurez aussi accès à votre avatar, pour le modifier cliquer sur le texte en dessous "changer l'avatar" vous choisirez alors l'image que vous désirez dans votre galerie, cliquer ensuite sur redimensionner en haut à droite pour passer à la suite si l'image vous convient, un bouton vert "Valider l'avatar" apparaitra ensuite pour permettre à la sauvegarde de l'image dans la Base de données. 
+
