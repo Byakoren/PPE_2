@@ -4,7 +4,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { View, StyleSheet, Platform } from 'react-native';
 
 export default function TabLayout() {
-  const { prenom, role } = useLocalSearchParams();
+
+  // Récupération des paramètres utilisateur (prénom, rôle)
+  const {id, prenom, role } = useLocalSearchParams();
 
   return (
     <SafeAreaProvider>
@@ -65,7 +67,7 @@ export default function TabLayout() {
                 <Ionicons name="time-outline" size={size} color={color} />
               ),
             }}
-            initialParams={{ prenom, role }}
+            initialParams={{id, prenom, role }}
           />
 
           <Tabs.Screen
