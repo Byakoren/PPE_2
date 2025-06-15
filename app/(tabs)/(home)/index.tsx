@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 80,
-    paddingBottom: 80,
+    paddingTop: 10,
+    paddingBottom: 160,
   },
 });

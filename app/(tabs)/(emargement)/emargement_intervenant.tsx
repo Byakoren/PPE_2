@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   innerContainer: {
     flexGrow: 1,
     padding: 20,
-    paddingBottom: 60,
+    paddingBottom: 150,
   },
   logo: {
     width: 250,
