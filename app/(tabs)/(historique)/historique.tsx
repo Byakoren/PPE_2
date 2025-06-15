@@ -32,6 +32,8 @@ export default function HistoriqueIntervenant() {
 
     //Parse la réponse http en json.
     const data = await response.json();
+    // Trie du plus récent au plus ancien selon heureDebut
+    data.reverse();
     setParticipations(data);
     
     }
@@ -40,7 +42,7 @@ export default function HistoriqueIntervenant() {
 
   //foreach pour louper dans la console et afficher les valeurs renvoyer en response.
   //debugage
-  {/*}
+  {/*
   participations.forEach((item, index)=>{
     console.log(`Cours: ${item.cours}`);
     console.log(`Matiere: ${item.matiere}`);
@@ -51,7 +53,7 @@ export default function HistoriqueIntervenant() {
     console.log(`Retard : ${item.retard}`);
     
   });
-  */}
+  */ }
   
   
 
