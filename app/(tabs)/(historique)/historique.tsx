@@ -1,10 +1,12 @@
 import { View, Text,StyleSheet,Image, FlatList } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useLocalSearchParams } from "expo-router";
 import { API_BASE_URL } from "../../config";
 //Import de useEffect() et useState()
 import { useEffect, useState} from "react";
 //Créer un type participation pour utiliser l'objet que l'on récupère avec notre fetch.
 type Participation = {
+  id: number,
   cours: string;
   matiere: string;
   crenaux: string;
@@ -16,6 +18,11 @@ type Participation = {
 };
 
 export default function HistoriqueIntervenant() {
+  //Récupération de l'id dans le hook useLocalSearchParams
+  const { id } = useLocalSearchParams();
+  //conversion en entier base 10
+  const userId = parseInt(id as string, 10);
+  //Déclaration d'un hook useState pour stocké les data de participation 
   const [participations, setParticipations] = useState<Participation[]>([]);
   
   //Utilisation d'un hook useEffect pour s'assurer que le fetch n'est 
@@ -25,7 +32,7 @@ export default function HistoriqueIntervenant() {
     async function afficherParticipation(){
 
     //Utilisation de fetch et stockage de la réponse dans 'response
-    const response = await fetch(`${API_BASE_URL}/api/users/5/participations`, {
+    const response = await fetch(`${API_BASE_URL}/api/users/${userId}/participations`, {
       headers: { "Accept": "application/json"},
 
       })
@@ -34,6 +41,7 @@ export default function HistoriqueIntervenant() {
     const data = await response.json();
     // Trie du plus récent au plus ancien selon heureDebut
     data.reverse();
+    //Enregistrement des data dans le hook Participations
     setParticipations(data);
     
     }
@@ -88,7 +96,7 @@ export default function HistoriqueIntervenant() {
           </View>
         </View>
     )}
-      keyExtractor={item=> item.cours}
+      keyExtractor={(item) => `${item.id}`}
     />
     
         

@@ -3,7 +3,7 @@ import { Tabs, useLocalSearchParams } from 'expo-router';
 // Layout principal des onglets de l'application
 export default function TabLayout() {
   // Récupération des paramètres utilisateur (prénom, rôle)
-  const { prenom, role } = useLocalSearchParams();
+  const {id, prenom, role } = useLocalSearchParams();
 
   return (
     <Tabs>
@@ -39,7 +39,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="(historique)/historique"
         options={{ title: 'Historique' }}
-        initialParams={{ prenom, role }}
+        initialParams={{id, prenom, role }}
       />
       {/* Onglet Profil */}
       <Tabs.Screen
