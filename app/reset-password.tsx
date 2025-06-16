@@ -37,7 +37,7 @@ export default function ResetPassword() {
 
     return (
       <SafeAreaView style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
-        <Text>Réinitialiser le mot de passe</Text>
+        <Text>Entrez votre E-Mail</Text>
   
         <TextInput
           style={{
