@@ -51,6 +51,7 @@ export default function TabLayout() {
               name="(emargement)/emargement_apprenant"
               options={{
                 title: 'Émarger',
+                headerShown: false,
                 tabBarIcon: ({ color, size }) => (
                   <Ionicons name="checkmark-circle-outline" size={size} color={color} />
                 ),
