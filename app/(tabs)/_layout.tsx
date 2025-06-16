@@ -1,52 +1,114 @@
 import { Tabs, useLocalSearchParams } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { View, StyleSheet, Platform } from 'react-native';
 
-// Layout principal des onglets de l'application
 export default function TabLayout() {
+
   // Récupération des paramètres utilisateur (prénom, rôle)
-  const { prenom, role } = useLocalSearchParams();
+  const {id, prenom, role } = useLocalSearchParams();
 
   return (
-    <Tabs>
-      {/* Onglet Accueil */}
-      <Tabs.Screen
-        name="(home)/index"
-        options={{
-          title: 'Accueil',
-          headerShown: false,
-        }}
-        initialParams={{ prenom, role }}
-      />
-
-      {/* Onglet Émargement : affiché différemment selon le rôle */}
-      {role === "ROLE_INTERVENANT" ? (
-        <Tabs.Screen
-          name="(emargement)/emargement_intervenant"
-          options={{ 
-            title: 'Émarger',
-            headerShown: false,
+    <SafeAreaProvider>
+      <View style={styles.container}>
+        <Tabs
+          screenOptions={{
+            tabBarActiveTintColor: '#F24C27',
+            tabBarInactiveTintColor: '#ffffff',
+            tabBarStyle: styles.tabBar,
+            tabBarLabelStyle: {
+              fontSize: 12,
+              fontWeight: '600',
+            },
           }}
-          initialParams={{ prenom, role }}
-        />
-      ) : (
-        <Tabs.Screen
-          name="(emargement)/emargement_apprenant"
-          options={{ title: 'Émarger' }}
-          initialParams={{ prenom, role }}
-        />
-      )}
+        >
+          <Tabs.Screen
+            name="(home)/index"
+            options={{
+              title: 'Accueil',
+              headerShown: false,
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="home-outline" size={size} color={color} />
+              ),
+            }}
+            initialParams={{ prenom, role }}
+          />
 
-      {/* Onglet Historique */}
-      <Tabs.Screen
-        name="(historique)/historique"
-        options={{ title: 'Historique' }}
-        initialParams={{ prenom, role }}
-      />
-      {/* Onglet Profil */}
-      <Tabs.Screen
-        name="(profil)/profil"
-        options={{ title: 'Profil' }}
-        initialParams={{ prenom, role }}
-      />
-    </Tabs>
+          {role === 'ROLE_INTERVENANT' ? (
+            <Tabs.Screen
+              name="(emargement)/emargement_intervenant"
+              options={{
+                title: 'Émarger',
+                headerShown: false,
+                tabBarIcon: ({ color, size }) => (
+                  <Ionicons name="clipboard-outline" size={size} color={color} />
+                ),
+              }}
+              initialParams={{ prenom, role }}
+            />
+          ) : (
+            <Tabs.Screen
+              name="(emargement)/emargement_apprenant"
+              options={{
+                title: 'Émarger',
+                tabBarIcon: ({ color, size }) => (
+                  <Ionicons name="checkmark-circle-outline" size={size} color={color} />
+                ),
+              }}
+              initialParams={{ prenom, role }}
+            />
+          )}
+
+          <Tabs.Screen
+            name="(historique)/historique"
+            options={{
+              title: 'Historique',
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="time-outline" size={size} color={color} />
+              ),
+            }}
+            initialParams={{id, prenom, role }}
+          />
+
+          <Tabs.Screen
+            name="(profil)/profil"
+            options={{
+              title: 'Profil',
+              headerShown: false,
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="person-circle-outline" size={size} color={color} />
+              ),
+            }}
+            initialParams={{ prenom, role }}
+          />
+        </Tabs>
+      </View>
+    </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#020024', 
+  },
+  tabBar: {
+    backgroundColor: '#1b2a59',
+    height: 70,
+    paddingBottom: 8,
+    paddingTop: 6,
+    borderRadius: 30,
+    marginHorizontal: 16,
+    marginBottom: Platform.OS === 'android' ? 50 : 20,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 15,
+    borderTopColor: '#000',
+  },
+});

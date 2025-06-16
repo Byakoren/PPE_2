@@ -25,7 +25,7 @@ export default function Login() {
    
     const[msgError,setMsgError] = useState(false);
     
-    //Loging.Méthode FETCH.Utilisations de dummyjson.com temporairement comme une 
+    //Loging.Méthode FETCH en asynchrone avec await.
     //API de test.
     async function loging(username:string,password:string){
      
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 0,
-    borderColor: "red",
+    //borderColor: "red",
     borderWidth: 1,
 
   },
