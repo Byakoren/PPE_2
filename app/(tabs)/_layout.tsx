@@ -63,6 +63,7 @@ export default function TabLayout() {
             name="(historique)/historique"
             options={{
               title: 'Historique',
+              headerShown: false,
               tabBarIcon: ({ color, size }) => (
                 <Ionicons name="time-outline" size={size} color={color} />
               ),

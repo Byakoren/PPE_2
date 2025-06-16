@@ -1,4 +1,4 @@
-import { View, Text,StyleSheet,Image, FlatList } from "react-native";
+import { View, Text,StyleSheet,Image, FlatList, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
 import { API_BASE_URL } from "../../config";
@@ -24,6 +24,8 @@ export default function HistoriqueIntervenant() {
   const userId = parseInt(id as string, 10);
   //Déclaration d'un hook useState pour stocké les data de participation 
   const [participations, setParticipations] = useState<Participation[]>([]);
+  //Déclaration d'un hook useState pour stocké l'état de chargement de la page 
+   const [loading, setLoading] = useState(true);
   
   //Utilisation d'un hook useEffect pour s'assurer que le fetch n'est 
   //éxecuter qu'au moment du premier rendu.
@@ -43,10 +45,24 @@ export default function HistoriqueIntervenant() {
     data.reverse();
     //Enregistrement des data dans le hook Participations
     setParticipations(data);
+    //Lorsque la page est rendu change Loading en false
+    setLoading(false);
     
     }
     afficherParticipation();
-  },[])
+  },[]);
+
+if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#273273" }}>
+        <Image source={require("../../../assets/images/gefor_vect3lueur.png")} style={styles.logo} resizeMode="contain"/>
+        <ActivityIndicator size="large" color="#fff" style={{ marginTop: 32 }} />
+        <Text style={{ color: "#fff", marginTop: 16 }}>Chargement...</Text>
+      </View>
+    );
+  }
+
+  
 
   //foreach pour louper dans la console et afficher les valeurs renvoyer en response.
   //debugage
@@ -69,9 +85,12 @@ export default function HistoriqueIntervenant() {
   return (
   <View style={styles.container}>
     <LinearGradient colors={["#273273", "#020024"]} style={styles.background} />
-    <Image source={require("../../../assets/images/gefor_vect3lueur.png")} style={styles.logo} resizeMode="contain"/>
+    
     <FlatList
       data={participations}
+      ListHeaderComponent={
+        <Image source={require("../../../assets/images/gefor_vect3lueur.png")} style={styles.logo} resizeMode="contain"/>
+      }
       renderItem={({item})=> (
         <View style={styles.card}>
           <View style={styles.cardInfoMatiereCrenau}>
@@ -97,6 +116,7 @@ export default function HistoriqueIntervenant() {
         </View>
     )}
       keyExtractor={(item) => `${item.id}`}
+      contentContainerStyle={{ paddingTop: 16, paddingBottom: 100 }}
     />
     
         
@@ -156,5 +176,6 @@ const styles = StyleSheet.create({
     width: 240,
     height: 100,
     alignSelf: "center", 
+    marginTop: 32
   },
 });
