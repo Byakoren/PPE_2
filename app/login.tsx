@@ -89,6 +89,11 @@ export default function Login() {
             secureTextEntry
             defaultValue={password}
           />
+          
+          <TouchableOpacity onPress={() => router.push('/reset-password')}> {/* redirection vers la pad de réinitialisation de mdp*/}
+          <Text style={styles.resetLink}>Mot de passe oublié ?</Text> {/* ajout du text avec sont style */}
+          </TouchableOpacity>
+
            {/*Bouton*/}
           <TouchableOpacity
             style={styles.button}
@@ -191,7 +196,10 @@ const styles = StyleSheet.create({
   },
   message_error:{
     color: '#FF0000'
-  }
+  },
 
+  resetLink:{
+    color:'#FF4000'
+  }
  
 })
