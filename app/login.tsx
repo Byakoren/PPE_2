@@ -90,8 +90,10 @@ export default function Login() {
             defaultValue={password}
           />
           
-          <TouchableOpacity onPress={() => router.push('/reset-password')}> {/* redirection vers la pad de réinitialisation de mdp*/}
-          <Text style={styles.resetLink}>Mot de passe oublié ?</Text> {/* ajout du text avec sont style */}
+          {/* redirection vers la pad de réinitialisation de mdp*/}
+          {/* ajout du text avec sont style */}
+          <TouchableOpacity onPress={() => router.push('/reset-password')}> 
+            <Text style={styles.resetLink}>Mot de passe oublié ?</Text> 
           </TouchableOpacity>
 
            {/*Bouton*/}
