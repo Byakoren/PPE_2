@@ -25,7 +25,8 @@ export default function HistoriqueIntervenant() {
   //Déclaration d'un hook useState pour stocké les data de participation 
   const [participations, setParticipations] = useState<Participation[]>([]);
   //Déclaration d'un hook useState pour stocké l'état de chargement de la page 
-   const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+
   
   //Utilisation d'un hook useEffect pour s'assurer que le fetch n'est 
   //éxecuter qu'au moment du premier rendu.
@@ -66,7 +67,7 @@ if (loading) {
 
   //foreach pour louper dans la console et afficher les valeurs renvoyer en response.
   //debugage
-  {/*
+  {/**/ }
   participations.forEach((item, index)=>{
     console.log(`Cours: ${item.cours}`);
     console.log(`Matiere: ${item.matiere}`);
@@ -77,7 +78,7 @@ if (loading) {
     console.log(`Retard : ${item.retard}`);
     
   });
-  */ }
+  
   
   
 
@@ -87,11 +88,51 @@ if (loading) {
     <LinearGradient colors={["#273273", "#020024"]} style={styles.background} />
     
     <FlatList
-      data={participations}
+    
+      data={participations} //Information passé dans les propriétés de la flatlist
       ListHeaderComponent={
         <Image source={require("../../../assets/images/gefor_vect3lueur.png")} style={styles.logo} resizeMode="contain"/>
       }
-      renderItem={({item})=> (
+      renderItem={({item})=>{
+        
+        let coursAvenir = false;
+        let coursEnCours = false;
+
+        {/*Construction de date avec les informations venu du backend*/}
+
+        const dateEtHeureDeb = `${item.crenaux} ${item.heureDebut}`;{/*Construction de la chaine correspondant à la date et heure de début du cours*/}  
+        
+        const dateEtHeureFin = `${item.crenaux} ${item.heureFin}`;{/*Construction de la chaine correspondant date et heure de fin du cours*/}  
+
+        {/*Récupération de la date d'aujourd'hui*/}
+        const dateAujourdui = new Date();{/*Date d'aujourd'hui*/}  
+
+        const dateCours = new Date(item.crenaux);{/*Objet Date avec date cours*/} 
+        const dateCoursDebut = new Date(dateEtHeureDeb);{/*Objet Date avec date et heure début*/} 
+        const dateCoursFin = new Date(dateEtHeureFin);{/*Objet Date avec date et heure fin*/} 
+
+        {/*Débugage heure et date. 
+        console.log(`Date d'aujourdui: ${dateAujourdui}`);
+        console.log(`Date du cours: ${dateCours}`)
+        console.log(`Date + heure deb: ${dateCoursDebut}`);
+        console.log(`Date + heure fin: ${dateCoursFin}`);*/}
+
+        {/*Condition pour afficher une étiquette correspondante au crénau*/} 
+        {/*Cour en cours, cours a venir ou cours déja passé*/} 
+        if (dateCoursDebut < dateAujourdui && dateCoursFin > dateAujourdui){
+          console.log("Cours en cours!");
+          coursEnCours = true;
+
+        }else if(dateCoursDebut > dateAujourdui){
+          coursAvenir = true;
+          console.log("Cours à venir!");
+          
+        }else{
+          console.log("Cours déja passé!");
+        }
+        
+        
+        return(
         <View style={styles.card}>
           <View style={styles.cardInfoMatiereCrenau}>
             {/*<Text style={styles.textcard}>{item.cours}</Text>*/}
@@ -104,9 +145,12 @@ if (loading) {
                 <Text style={[styles.textcard, { fontWeight: "bold", fontSize: 18 }]}>✅validé</Text>
                 ) : item.signé === "signé" ? (
                 <Text style={[styles.textcard, { fontWeight: "bold", fontSize: 18 }]}>🖋️signé</Text>
-                ) : (
-                <Text style={[styles.textcard, { color: "#FFAEAE", fontWeight: "bold", fontSize: 18 }]}>❌absent</Text>
+                ) : coursAvenir === true ? (<Text style={[styles.textcard, { fontWeight: "bold", fontSize: 18 }]}>⌛Cours a venir</Text>
+                
+                ) : (<Text style={[styles.textcard, { color: "#FFAEAE", fontWeight: "bold", fontSize: 18 }]}>❌absent</Text>
                 )}
+                {coursEnCours === true ? (<Text style={[styles.textcard, { color: "#90EE90", fontWeight: "bold", fontSize: 18 }]}>🟢en cours</Text>) : ""}
+                
               {item.retard !== 0 && (
                 <Text style={[styles.textcard, { color: "#F57C00" }]}>
                   Retard {item.retard} min
@@ -115,6 +159,8 @@ if (loading) {
           </View>
         </View>
     )}
+  }
+
       keyExtractor={(item) => `${item.id}`}
       contentContainerStyle={{ paddingTop: 16, paddingBottom: 100 }}
     />
