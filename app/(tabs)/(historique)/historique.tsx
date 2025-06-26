@@ -24,36 +24,54 @@ export default function HistoriqueIntervenant() {
   const userId = parseInt(id as string, 10);
   //Déclaration d'un hook useState pour stocké les data de participation 
   const [participations, setParticipations] = useState<Participation[]>([]);
-  //Déclaration d'un hook useState pour stocké l'état de chargement de la page 
-  const [loading, setLoading] = useState(true);
+  //Déclaration d'un hook useState pour stocké l'état de chargement de la flatlist pour le pull-refresh
+  const [loading, setLoading] = useState(false);
+  //Déclaration d'un hook useState pour stocké l'état de chargement lors du montage du composant
+  const [initialLoading, setInitialLoading] = useState(true); 
 
-  
+  //Déclaration d'une fonction asynchrone afin de consommer l'api coté serveur.
+  //Cette fonction est utilisé lors du raffraichissement de la flat list via le mécaniseme de pull-to-refresh.
+    async function afficherParticipation(){
+      //Lorsque appelé, loading est mis a true,cela permet d'afficher un spinner dans la flatlist.
+      setLoading(true);
+      //try catch pour intercepter les erreurs et le fetch pour consommer l'API
+      try {
+        //await new Promise(r => setTimeout(r, 1500));
+        const response = await fetch(`${API_BASE_URL}/api/users/${userId}/participations`, {
+          headers: { "Accept": "application/json" },
+        });
+        const data = await response.json();
+        data.reverse();
+        setParticipations(data);
+      } catch (e) {
+        console.error(e); //affiche l'érreur dans la console
+      } finally {
+        setLoading(false);
+      }
+      
+    }
+
   //Utilisation d'un hook useEffect pour s'assurer que le fetch n'est 
   //éxecuter qu'au moment du premier rendu.
   useEffect(()=> {
-    //Déclaration d'une fonction asynchrone afin de consommer l'api coté serveur.
-    async function afficherParticipation(){
-
-    //Utilisation de fetch et stockage de la réponse dans 'response
-    const response = await fetch(`${API_BASE_URL}/api/users/${userId}/participations`, {
-      headers: { "Accept": "application/json"},
-
-      })
-
-    //Parse la réponse http en json.
-    const data = await response.json();
-    // Trie du plus récent au plus ancien selon heureDebut
-    data.reverse();
-    //Enregistrement des data dans le hook Participations
-    setParticipations(data);
-    //Lorsque la page est rendu change Loading en false
-    setLoading(false);
-    
+    async function fetchData() {
+    //try catch pour intercepter les erreurs et le fetch pour consommer l'API
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users/${userId}/participations`, {
+        headers: { "Accept": "application/json" },
+      });
+      const data = await response.json();
+      data.reverse();
+      setParticipations(data);
+    } catch (e) {
+      console.error(e); //affiche l'érreur dans la console
     }
-    afficherParticipation();
-  },[]);
+    setInitialLoading(false); //Met InitialLoading à false pour arreter le chargement au premier rendu.
+  }
+  fetchData();
+}, [userId]);
 
-if (loading) {
+if (initialLoading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#273273" }}>
         <Image source={require("../../../assets/images/gefor_vect3lueur.png")} style={styles.logo} resizeMode="contain"/>
@@ -67,7 +85,7 @@ if (loading) {
 
   //foreach pour louper dans la console et afficher les valeurs renvoyer en response.
   //debugage
-  {/**/ }
+  {/*
   participations.forEach((item, index)=>{
     console.log(`Cours: ${item.cours}`);
     console.log(`Matiere: ${item.matiere}`);
@@ -77,7 +95,7 @@ if (loading) {
     console.log(`Signature : ${item.signé}`);
     console.log(`Retard : ${item.retard}`);
     
-  });
+  });*/ }
   
   
   
@@ -86,12 +104,50 @@ if (loading) {
   return (
   <View style={styles.container}>
     <LinearGradient colors={["#273273", "#020024"]} style={styles.background} />
-    
+      {/* Spinner custom visible pendant le refresh 
+      Le spinner d'orignine est non visible,ducoup ajout d'un spinner tant que loading est vrai*/}
+    {loading && (
+      <View style={{
+        position: 'absolute',
+        top: 60,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+        zIndex: 10,
+      }}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    )}
     <FlatList
     
       data={participations} //Information passé dans les propriétés de la flatlist
+      onRefresh={afficherParticipation} //Ici on utilise la propes OnRefresh pour éxecuter "afficherParticipation" lors du pull-for-refresh
+      refreshing={loading} //Indique lorsque le raffraichissement (fetch a l'api) est en cours au composant
+
       ListHeaderComponent={
+        <View>
         <Image source={require("../../../assets/images/gefor_vect3lueur.png")} style={styles.logo} resizeMode="contain"/>
+        <Text
+          style={[
+            styles.textcard,
+            {
+              color: "#90EE90",
+              fontStyle: "italic",
+              fontSize: 14,
+              textAlign: "center",
+              marginTop: 8,
+              marginBottom: 8,
+              backgroundColor: "rgba(255,255,255,0.08)",
+              borderRadius: 8,
+              paddingVertical: 6,
+              paddingHorizontal: 12,
+              alignSelf: "center",
+            },
+          ]}
+        >
+          ⬆️ Scroller vers le haut pour rafraîchir la liste
+        </Text>
+        </View>
       }
       renderItem={({item})=>{
         
@@ -118,6 +174,7 @@ if (loading) {
         console.log(`Date + heure fin: ${dateCoursFin}`);*/}
 
         {/*Condition pour afficher une étiquette correspondante au crénau*/} 
+
         {/*Cour en cours, cours a venir ou cours déja passé*/} 
         if (dateCoursDebut < dateAujourdui && dateCoursFin > dateAujourdui){
           console.log("Cours en cours!");
@@ -133,6 +190,7 @@ if (loading) {
         
         
         return(
+        //Render des informations dans la liste pour chaque cours.
         <View style={styles.card}>
           <View style={styles.cardInfoMatiereCrenau}>
             {/*<Text style={styles.textcard}>{item.cours}</Text>*/}
@@ -177,7 +235,7 @@ const styles = StyleSheet.create({
     //alignItems: "center",
     position: "relative",
     //borderColor: "red",
-    borderWidth: 2, // Ajoute une bordure rouge pour le debug
+    //borderWidth: 2, // Ajoute une bordure rouge pour le debug
   },
   card: {
     flexDirection: "row",
